@@ -1,0 +1,252 @@
+/* ... (all previous styles are the same until the Results section) ... */
+:root {
+    --pink: #ffafcc;
+    --purple: #a2d2ff;
+    --blue: #bde0fe;
+    --white: #ffffff;
+    --dark-text: #4a4a4a;
+    --shutter-red: #f44336;
+    --shutter-dark: #d32f2f;
+    --delete-red: #ff8fa3; /* New color variable */
+}
+
+/* --- (body, camera-ui, and other styles remain unchanged) --- */
+body {
+    background: linear-gradient(45deg, var(--pink), var(--blue));
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    gap: 20px;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.camera-ui {
+    background: #fdfcff;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* --- Top Bar & View --- */
+.camera-top-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px 15px;
+}
+
+.camera-view {
+    position: relative;
+    width: 100%;
+    height: 320px; /* Adjust as needed */
+    border-radius: 20px;
+    overflow: hidden;
+    background: #222;
+}
+
+
+#previewCanvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.2s ease-in-out;
+}
+
+/* Viewfinder Overlay */
+.viewfinder-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.viewfinder-overlay::before, .viewfinder-overlay::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-color: rgba(255, 255, 255, 0.6);
+    border-style: solid;
+}
+.viewfinder-overlay::before {
+    top: 15px; left: 15px; border-width: 3px 0 0 3px; border-top-left-radius: 5px;
+}
+.viewfinder-overlay::after {
+    top: 15px; right: 15px; border-width: 3px 3px 0 0; border-top-right-radius: 5px;
+}
+/* A bit of a hack to get all 4 corners without more elements */
+.camera-view::before, .camera-view::after {
+    content: ''; position: absolute; width: 30px; height: 30px; border-color: rgba(255, 255, 255, 0.6); border-style: solid; z-index: 2; pointer-events: none;
+}
+.camera-view::before {
+    bottom: 15px; left: 15px; border-width: 0 0 3px 3px; border-bottom-left-radius: 5px;
+}
+.camera-view::after {
+    bottom: 15px; right: 15px; border-width: 0 3px 3px 0; border-bottom-right-radius: 5px;
+}
+
+
+/* --- Controls --- */
+.camera-controls {
+    padding-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Filter Tray */
+.filter-tray {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 10px 0;
+    scrollbar-width: none; /* Firefox */
+}
+.filter-tray::-webkit-scrollbar { display: none; /* Safari/Chrome */ }
+
+.filter-button {
+    flex-shrink: 0;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 5px;
+    background: var(--blue);
+    color: var(--dark-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 8px 16px;
+}
+
+.filter-button.active {
+    border-color: var(--pink);
+    background-color: var(--white);
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button:not(.active):hover {
+    background-color: #d1e9ff;
+}
+
+/* Shutter Area */
+.shutter-area {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 5px;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.icon-button:hover { opacity: 1; }
+.icon-button svg { width: 32px; height: 32px; stroke: var(--dark-text); }
+
+.shutter-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: var(--shutter-red);
+    border: 5px solid var(--white);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px var(--shutter-red);
+    transition: all 0.2s ease-in-out;
+}
+.shutter-button:hover { transform: scale(1.05); }
+.shutter-button:active { background-color: var(--shutter-dark); box-shadow: 0 0 0 4px var(--shutter-dark); transform: scale(0.98); }
+.shutter-button:disabled { background-color: #9e9e9e; box-shadow: 0 0 0 4px #9e9e9e; cursor: not-allowed; }
+
+.controls-disabled { pointer-events: none; opacity: 0.7; }
+
+/* --- Effects & Countdown --- */
+.countdown-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex;
+    justify-content: center; align-items: center; font-size: 15vw;
+    color: white; font-weight: bold; -webkit-text-stroke: 3px rgba(0,0,0,0.5);
+    opacity: 0; transition: opacity 0.3s ease-in-out; pointer-events: none;
+}
+.flash-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: white; opacity: 0; pointer-events: none;
+}
+.flash-animation { animation: flash 0.3s ease-out; }
+@keyframes flash { from { opacity: 0.8; } to { opacity: 0; } }
+
+/* --- Results --- */
+.results-area {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    padding: 20px;
+    border-radius: 20px;
+    max-width: 400px;
+}
+h2 {
+    margin: 0; color: var(--dark-text); font-weight: 700;
+}
+#stripCanvas {
+    border: 5px solid white;
+    border-radius: 5px;
+    background-color: #fff;
+    max-width: 90%; 
+    height: auto;
+}
+
+/* START: NEW & UPDATED STYLES */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.action-button {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    color: var(--dark-text);
+    text-decoration: none; border-radius: 50px; font-weight: 500;
+    transition: all 0.3s;
+    border: none; /* For the button element */
+    cursor: pointer; /* For the button element */
+    font-family: 'Poppins', sans-serif; /* For the button element */
+    font-size: 16px; /* For the button element */
+}
+
+.action-button:hover {
+    transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.action-button svg { stroke: var(--dark-text); }
+
+.download-button {
+    background-color: var(--blue);
+}
+.download-button:hover {
+    background-color: #a9d6ff;
+}
+
+.delete-button {
+    background-color: var(--delete-red);
+}
+.delete-button:hover {
+    background-color: #ff758f;
+}
+/* END: NEW & UPDATED STYLES */
